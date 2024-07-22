@@ -48,7 +48,7 @@ func (s *MySQLStorage) createProjectsTable() error {
 		CREATE TABLE IF NOT EXISTS projects (
 		  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
 		  name VARCHAR(255) NOT NULL,
-		  createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+		  createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
 		  PRIMARY KEY (id)
 		  ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -69,7 +69,7 @@ func (s *MySQLStorage) createUsersTable() error {
 
 			PRIMARY KEY (id),
 			UNIQUE KEY (email)
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8;`)
 
 	return err
 }

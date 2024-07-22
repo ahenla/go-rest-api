@@ -25,7 +25,7 @@ func (s *APIServer) Serve() {
 
 	// registering services
 	tasksService := NewTaskService(s.store)
-	tasksService.RegisterRoutes(router)
+	tasksService.RegisterRoutes(subrouter)
 
 	log.Println("Starting server on port", s.addr)
 
