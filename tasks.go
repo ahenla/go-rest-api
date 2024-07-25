@@ -73,5 +73,14 @@ func validateTaskPayload(task *Task) error {
 }
 
 func (s *TaskService) handleGetTask(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
 
+	t, err := s.store.GetTask(id)
+	if err != nil {
+		WriteJSON(w, http.StatusInternalServerError, ErrorResponse{Error: "task not found"})
+		return
+	}
+
+	WriteJSON(w, http.StatusOK, t)
 }
