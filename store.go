@@ -6,6 +6,11 @@ type Store interface {
 	//Users
 	CreateUser(u *User) (*User, error)
 	GetUserByID(id string) (*User, error)
+
+	//Projects
+	CreateProject(p *Project) error
+	GetProject(id string) (*Project, error)
+	DeleteProject(id string) error
 	//Tasks
 	CreateTask(t *Task) (*Task, error)
 	GetTask(id string) (*Task, error)
@@ -19,6 +24,26 @@ func NewStorage(db *sql.DB) *Storage {
 	return &Storage{
 		db: db,
 	}
+}
+
+func (s *Storage) CreateProject(p *Project) error {
+	_, err := s.db.Exec("INSERT INTO projects (name) VALUES (?)", p.Name)
+	return err
+}
+
+func (s *Storage) GetProject(id string) (*Project, error) {
+	var p Project
+	err := s.db.QueryRow("SELECT id, name, createdAt FROM projects WHERE id = ? ", id).Scan(&p.ID, &p.Name, &p.CreatedAt)
+	return &p, err
+}
+
+func (s *Storage) DeleteProject(id string) error {
+	_, err := s.db.Exec("DELETE FROM projects WHERE id = ? ", id)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *Storage) CreateUser(u *User) (*User, error) {

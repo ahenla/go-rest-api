@@ -6,6 +6,12 @@ type ErrorResponse struct {
 	Error string `json: "error"`
 }
 
+type Project struct {
+	ID        int64     `json: "id"`
+	Name      string    `json: "name"`
+	CreatedAt time.Time `json: "createdAt"`
+}
+
 type Task struct {
 	ID           int64     `json: "id"`
 	Name         string    `json: "name"`
