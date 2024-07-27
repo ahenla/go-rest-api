@@ -40,11 +40,21 @@ func (s *UserService) handleUserRegister(w http.ResponseWriter, r *http.Request)
 		WriteJSON(w, http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 	}
 
+	hashedPW := HashPassword(payload.Password)
+	if err != nil {
+		WriteJSON(w, http.StatusInternalServerError, ErrorResponse{Error: "Error creating user"})
+		return
+	}
+
+	payload.Password = hashedPW
+
 	u, err := s.store.CreateUser(payload)
 	if err != nil {
 		WriteJSON(w, http.StatusBadRequest, ErrorResponse{Error: "Error creating user"})
-
+		return
 	}
+
+	token := createAndSetCookie(u.ID, w)
 }
 
 func validateUserPayload(user *User) error {
@@ -66,4 +76,19 @@ func validateUserPayload(user *User) error {
 
 	return nil
 
+}
+
+func createAndSetCookie(id int64, w http.ResponseWriter) {
+	secret := []byte(Envs.JWTSecret)
+	token, err := CreateJWT(secret, userID)
+	if err != nil {
+		return "", err
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:  "Authorization",
+		Value: token,
+	})
+
+	return token, nil
 }
