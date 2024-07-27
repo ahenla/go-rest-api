@@ -33,7 +33,6 @@ func (s *Storage) CreateUser(u *User) (*User, error) {
 	}
 
 	u.ID = id
-
 	return u, nil
 }
 

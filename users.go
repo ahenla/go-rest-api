@@ -40,7 +40,7 @@ func (s *UserService) handleUserRegister(w http.ResponseWriter, r *http.Request)
 		WriteJSON(w, http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 	}
 
-	hashedPW := HashPassword(payload.Password)
+	hashedPW, err := HashPassword(payload.Password)
 	if err != nil {
 		WriteJSON(w, http.StatusInternalServerError, ErrorResponse{Error: "Error creating user"})
 		return
@@ -54,7 +54,12 @@ func (s *UserService) handleUserRegister(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	token := createAndSetCookie(u.ID, w)
+	token, err := createAndSetCookie(u.ID, w)
+	if err != nil {
+		WriteJSON(w, http.StatusInternalServerError, ErrorResponse{Error: "Error creating session"})
+	}
+
+	WriteJSON(w, http.StatusCreated, token)
 }
 
 func validateUserPayload(user *User) error {
@@ -63,7 +68,7 @@ func validateUserPayload(user *User) error {
 	}
 
 	if user.FirstName == "" {
-		return errFirsNameRequired
+		return errFirstNameRequired
 	}
 
 	if user.LastName == "" {
@@ -78,9 +83,9 @@ func validateUserPayload(user *User) error {
 
 }
 
-func createAndSetCookie(id int64, w http.ResponseWriter) {
+func createAndSetCookie(id int64, w http.ResponseWriter) (string, error) {
 	secret := []byte(Envs.JWTSecret)
-	token, err := CreateJWT(secret, userID)
+	token, err := CreateJWT(secret, id)
 	if err != nil {
 		return "", err
 	}

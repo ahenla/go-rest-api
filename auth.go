@@ -79,13 +79,13 @@ func validateJWT(t string) (*jwt.Token, error) {
 	})
 }
 
-func HashPassword(pw string) string {
+func HashPassword(pw string) (string, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(pw), bcrypt.DefaultCost)
 	if err != nil {
-		return ""
+		return "", err
 	}
 
-	return string(hash)
+	return string(hash), nil
 }
 
 func CreateJWT(secret []byte, userID int64) (string, error) {
